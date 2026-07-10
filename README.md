@@ -1,6 +1,6 @@
-# GraphVis - Graph Editor for Competitive Programming
+# GraphCP - Graph Editor for Competitive Programming
 
-GraphVis is the ultimate, zero-dependency, single-file HTML5 graph editor and algorithm visualizer designed specifically for Competitive Programming. It is built to help you quickly construct graphs, visualize complex algorithms, and seamlessly translate them into C++, Python, or Edge List representations.
+GraphCP is the ultimate, zero-dependency, single-file HTML5 graph editor and algorithm visualizer designed specifically for Competitive Programming. It is built to help you quickly construct graphs, visualize complex algorithms, and seamlessly translate them into C++, Python, or Edge List representations.
 
 ## 🚀 Key Features
 
@@ -42,7 +42,7 @@ You can switch between tools using the top toolbar, or by utilizing the convenie
 
 ## 🏃 Getting Started
 
-Because GraphVis is completely client-side, getting started takes less than a second:
+Because GraphCP is completely client-side, getting started takes less than a second:
 
 1.  Clone this repository or download the `index.html` file.
 2.  Open `index.html` in any modern web browser (Google Chrome, Firefox, Safari, Edge).

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GraphVis — Graph Editor for Competitive Programming</title>
+<title>GraphCP — Graph Editor for Competitive Programming</title>
 <meta name="description" content="The ultimate graph editor for competitive programming. Visualize BFS, DFS, Dijkstra, Kruskal MST, bridges, SCC, topological sort and more with step-by-step animation.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -177,7 +177,7 @@ kbd{display:inline-block;padding:1px 5px;background:var(--bg2);border:1px solid 
 </head>
 <body>
 <div id="header">
-  <div class="logo"><div class="logo-hex">&#x2b21;</div><span class="logo-name">GraphVis</span></div>
+  <div class="logo"><div class="logo-hex">&#x2b21;</div><span class="logo-name">GraphCP</span></div>
   <div class="hsep"></div>
   <div class="tool-group">
     <button class="tbtn active" id="t-sel" title="Select [V]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 3l14 9-7 1-3 7z"/></svg></button>
@@ -523,7 +523,7 @@ function showSC(){openModal('Keyboard Shortcuts','<table class="sct"><thead><tr>
 document.getElementById('btn-sc').onclick=showSC;
 document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;const ctrl=e.ctrlKey||e.metaKey;if(ctrl&&e.key==='z'){e.preventDefault();undo();return;}if(ctrl&&(e.key==='y'||(e.shiftKey&&e.key==='Z'))){e.preventDefault();redo();return;}if(e.key==='v'||e.key==='V')setMode('select');if(e.key==='n'||e.key==='N')setMode('addNode');if(e.key==='e'||e.key==='E')setMode('addEdge');if(e.key==='Delete'||e.key==='Backspace'){if(UI.selNode){delNode(UI.selNode);return;}if(UI.selEdge){delEdge(UI.selEdge);return;}setMode('delete');}if(e.key==='f'||e.key==='F')fitView();if(e.key==='?')showSC();if(e.key==='Escape'){UI.edgeSrc=null;desel();setMode('select');}});
 new ResizeObserver(()=>resize()).observe(document.getElementById('cw'));
-function init(){resize();UI.panX=canvas.width/2;UI.panY=canvas.height/2;setMode('select');requestAnimationFrame(render);addLog('\u2192','Welcome to GraphVis \u2014 the ultimate CP graph editor!','hl');addLog('\u2192','Press N to add nodes, E to draw edges, V to select/move.','');addLog('\u2192','Right-click any node/edge for context menu. Scroll to zoom.','');addLog('\u2192','Paste edge lists in I/O tab. Algorithms in Algo tab.','');}
+function init(){resize();UI.panX=canvas.width/2;UI.panY=canvas.height/2;setMode('select');requestAnimationFrame(render);addLog('\u2192','Welcome to GraphCP \u2014 the ultimate CP graph editor!','hl');addLog('\u2192','Press N to add nodes, E to draw edges, V to select/move.','');addLog('\u2192','Right-click any node/edge for context menu. Scroll to zoom.','');addLog('\u2192','Paste edge lists in I/O tab. Algorithms in Algo tab.','');}
 init();
 </script>
 </body>
