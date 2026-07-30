@@ -176,3 +176,507 @@ document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].include
 new ResizeObserver(()=>resize()).observe(document.getElementById('cw'));
 function init(){resize();UI.panX=canvas.width/2;UI.panY=canvas.height/2;setMode('select');requestAnimationFrame(render);addLog('\u2192','Welcome to GraphCP \u2014 the ultimate CP graph editor!','hl');addLog('\u2192','Press N to add nodes, E to draw edges, V to select/move.','');addLog('\u2192','Right-click any node/edge for context menu. Scroll to zoom.','');addLog('\u2192','Paste edge lists in I/O tab. Algorithms in Algo tab.','');}
 init();
+
+/* ══════════════════════════════════════════════════════════════
+   FLOATING PANEL & ULTRA-REALISTIC 3D WATER DROP CONTROLLER
+   ══════════════════════════════════════════════════════════════ */
+(function initFloatingSidebar() {
+  const SNAP_GAP     = 16;
+  const TOP_GAP      = 60;
+  const SNAP_ZONE    = 0.35;
+  const DRAG_THRESH  = 6;
+  const MORPH_DUR    = 440;
+  const CORNERS      = ['TR', 'TL', 'BL', 'BR'];
+
+  const panel          = document.getElementById('sidebar');
+  const dragHandle     = document.getElementById('drag-handle');
+  const bubble         = document.getElementById('bubble');
+  const cornerBadge    = document.getElementById('corner-badge');
+  const btnCornerCycle = document.getElementById('btn-corner-cycle');
+  const btnBubble      = document.getElementById('btn-bubble');
+  const resizeE        = document.getElementById('resize-e');
+  const resizeS        = document.getElementById('resize-s');
+  const resizeSE       = document.getElementById('resize-se');
+
+  const pState = {
+    corner:   'TR',
+    isBubble: false,
+    panelW:   290,
+    panelH:   null,
+    morphing: false
+  };
+
+  function forceReflow(el) { void el.offsetHeight; }
+  function panelRect() { return panel.getBoundingClientRect(); }
+  function vp() { return { w: window.innerWidth, h: window.innerHeight }; }
+
+  function snapToCorner(corner) {
+    panel.style.left   = '';
+    panel.style.right  = '';
+    panel.style.top    = '';
+    panel.style.bottom = '';
+
+    switch (corner) {
+      case 'TR':
+        panel.style.right = SNAP_GAP + 'px';
+        panel.style.top   = TOP_GAP + 'px';
+        break;
+      case 'TL':
+        panel.style.left = SNAP_GAP + 'px';
+        panel.style.top  = TOP_GAP + 'px';
+        break;
+      case 'BL':
+        panel.style.left   = SNAP_GAP + 'px';
+        panel.style.bottom = SNAP_GAP + 'px';
+        break;
+      case 'BR':
+        panel.style.right  = SNAP_GAP + 'px';
+        panel.style.bottom = SNAP_GAP + 'px';
+        break;
+    }
+
+    pState.corner = corner;
+    panel.dataset.corner = corner;
+    updateCornerBadge();
+    updateBubbleCorner();
+  }
+
+  function updateCornerBadge() {
+    if (!cornerBadge) return;
+    cornerBadge.textContent = pState.corner;
+    cornerBadge.classList.add('active');
+    cornerBadge.style.transform = 'scale(1.15)';
+    setTimeout(() => { cornerBadge.style.transform = ''; }, 250);
+  }
+
+  function updateBubbleCorner() {
+    if (!bubble) return;
+    bubble.style.left   = '';
+    bubble.style.right  = '';
+    bubble.style.top    = '';
+    bubble.style.bottom = '';
+
+    switch (pState.corner) {
+      case 'TR': bubble.style.right = SNAP_GAP + 'px'; bubble.style.top    = TOP_GAP + 'px'; break;
+      case 'TL': bubble.style.left  = SNAP_GAP + 'px'; bubble.style.top    = TOP_GAP + 'px'; break;
+      case 'BL': bubble.style.left  = SNAP_GAP + 'px'; bubble.style.bottom = SNAP_GAP + 'px'; break;
+      case 'BR': bubble.style.right = SNAP_GAP + 'px'; bubble.style.bottom = SNAP_GAP + 'px'; break;
+    }
+  }
+
+  function detectCornerFromCenter() {
+    const { w, h } = vp();
+    const r = panelRect();
+    const cx = r.left + r.width  / 2;
+    const cy = r.top  + r.height / 2;
+    const isLeft = cx < w / 2;
+    const isTop  = cy < h / 2;
+    if ( isLeft &&  isTop) return 'TL';
+    if (!isLeft &&  isTop) return 'TR';
+    if ( isLeft && !isTop) return 'BL';
+    return 'BR';
+  }
+
+  function isInSnapZone() {
+    const { w, h } = vp();
+    const r = panelRect();
+    const cx = r.left + r.width  / 2;
+    const cy = r.top  + r.height / 2;
+    return (
+      cx < w * SNAP_ZONE || cx > w * (1 - SNAP_ZONE) ||
+      cy < h * SNAP_ZONE || cy > h * (1 - SNAP_ZONE)
+    );
+  }
+
+  /* --- Panel Drag --- */
+  if (dragHandle) {
+    let dragging = false;
+    let startX, startY, startL, startT;
+
+    dragHandle.addEventListener('mousedown', (e) => {
+      if (e.button !== 0 || pState.isBubble || pState.morphing) return;
+      if (e.target.closest('.win-btns')) return;
+
+      dragging = true;
+      const r = panelRect();
+      startL = r.left;
+      startT = r.top;
+      startX = e.clientX;
+      startY = e.clientY;
+
+      panel.style.transition = 'none';
+      panel.style.left   = startL + 'px';
+      panel.style.top    = startT + 'px';
+      panel.style.right  = '';
+      panel.style.bottom = '';
+
+      panel.classList.add('dragging');
+      document.body.style.cursor = 'grabbing';
+      e.preventDefault();
+
+      function onDragMove(ev) {
+        if (!dragging) return;
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        const { w, h } = vp();
+        const pr = panelRect();
+
+        const newLeft = Math.max(0, Math.min(w - pr.width,  startL + dx));
+        const newTop  = Math.max(0, Math.min(h - pr.height, startT + dy));
+
+        panel.style.left = newLeft + 'px';
+        panel.style.top  = newTop  + 'px';
+        panel.classList.toggle('snap-preview', isInSnapZone());
+      }
+
+      function onDragEnd() {
+        if (!dragging) return;
+        dragging = false;
+        panel.classList.remove('dragging', 'snap-preview');
+        document.body.style.cursor = '';
+        panel.style.transition = '';
+
+        const corner = detectCornerFromCenter();
+        snapToCorner(corner);
+
+        window.removeEventListener('mousemove', onDragMove);
+        window.removeEventListener('mouseup',   onDragEnd);
+      }
+
+      window.addEventListener('mousemove', onDragMove);
+      window.addEventListener('mouseup',   onDragEnd);
+    });
+  }
+
+  /* --- Bubble Drag & Click --- */
+  if (bubble) {
+    let dragging  = false;
+    let totalDist = 0;
+    let startX, startY, startL, startT;
+
+    bubble.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      dragging  = false;
+      totalDist = 0;
+
+      const r = bubble.getBoundingClientRect();
+      startL = r.left;
+      startT = r.top;
+      startX = e.clientX;
+      startY = e.clientY;
+
+      bubble.style.transition = 'none';
+      bubble.style.left   = startL + 'px';
+      bubble.style.top    = startT + 'px';
+      bubble.style.right  = '';
+      bubble.style.bottom = '';
+      bubble.style.animationPlayState = 'paused';
+
+      document.body.style.cursor = 'grabbing';
+      e.preventDefault();
+
+      function onBubbleMove(ev) {
+        totalDist += Math.abs(ev.movementX) + Math.abs(ev.movementY);
+        if (totalDist >= DRAG_THRESH) dragging = true;
+        if (!dragging) return;
+
+        const { w, h } = vp();
+        const br = bubble.getBoundingClientRect();
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+
+        const newLeft = Math.max(0, Math.min(w - br.width,  startL + dx));
+        const newTop  = Math.max(0, Math.min(h - br.height, startT + dy));
+
+        bubble.style.left = newLeft + 'px';
+        bubble.style.top  = newTop  + 'px';
+      }
+
+      function onBubbleUp() {
+        document.body.style.cursor = '';
+        window.removeEventListener('mousemove', onBubbleMove);
+        window.removeEventListener('mouseup',   onBubbleUp);
+        bubble.style.animationPlayState = '';
+
+        if (totalDist < DRAG_THRESH) {
+          expandPanel();
+        } else {
+          bubble.style.transition = '';
+          const { w, h } = vp();
+          const br = bubble.getBoundingClientRect();
+          const cx = br.left + br.width  / 2;
+          const cy = br.top  + br.height / 2;
+          const isLeft = cx < w / 2;
+          const isTop  = cy < h / 2;
+
+          let corner;
+          if ( isLeft &&  isTop) corner = 'TL';
+          else if (!isLeft &&  isTop) corner = 'TR';
+          else if ( isLeft && !isTop) corner = 'BL';
+          else corner = 'BR';
+
+          pState.corner = corner;
+          panel.dataset.corner = corner;
+          updateCornerBadge();
+          updateBubbleCorner();
+        }
+      }
+
+      window.addEventListener('mousemove', onBubbleMove);
+      window.addEventListener('mouseup',   onBubbleUp);
+    });
+  }
+
+  /* --- Morph Functions --- */
+  function collapsePanel() {
+    if (pState.morphing || pState.isBubble) return;
+    pState.morphing = true;
+
+    const pr = panelRect();
+    const pw = pr.width;
+    const ph = pr.height;
+
+    panel.style.width   = pw + 'px';
+    panel.style.height  = ph + 'px';
+    panel.style.left    = pr.left + 'px';
+    panel.style.top     = pr.top  + 'px';
+    panel.style.right   = '';
+    panel.style.bottom  = '';
+    panel.style.transition = 'none';
+
+    forceReflow(panel);
+    updateBubbleCorner();
+    const br = bubble.getBoundingClientRect();
+
+    panel.style.transition = '';
+
+    requestAnimationFrame(() => {
+      panel.style.width        = '58px';
+      panel.style.height       = '58px';
+      panel.style.borderRadius = '50%';
+      panel.style.left         = br.left + 'px';
+      panel.style.top          = br.top  + 'px';
+      panel.style.overflow     = 'hidden';
+      panel.style.outline      = 'none';
+
+      setTimeout(() => {
+        bubble.classList.add('is-active');
+        bubble.style.transform = '';
+      }, 80);
+
+      setTimeout(() => {
+        panel.classList.add('is-bubble');
+        pState.isBubble = true;
+        pState.morphing = false;
+
+        panel.style.width        = '';
+        panel.style.height       = '';
+        panel.style.borderRadius = '';
+        panel.style.left         = '';
+        panel.style.top          = '';
+        panel.style.overflow     = '';
+        panel.style.outline      = '';
+
+        snapToCorner(pState.corner);
+      }, MORPH_DUR + 40);
+    });
+  }
+
+  function expandPanel() {
+    if (pState.morphing || !pState.isBubble) return;
+    pState.morphing = true;
+
+    spawnRipple();
+    const br = bubble.getBoundingClientRect();
+    bubble.classList.remove('is-active');
+
+    panel.classList.remove('is-bubble');
+    panel.style.width        = '58px';
+    panel.style.height       = '58px';
+    panel.style.borderRadius = '50%';
+    panel.style.left         = br.left + 'px';
+    panel.style.top          = br.top  + 'px';
+    panel.style.right        = '';
+    panel.style.bottom       = '';
+    panel.style.transition   = 'none';
+    panel.style.overflow     = 'hidden';
+    panel.style.outline      = 'none';
+
+    forceReflow(panel);
+
+    const targetW = pState.panelW || 290;
+    const targetH = pState.panelH ? pState.panelH + 'px' : '';
+
+    panel.style.transition = '';
+
+    requestAnimationFrame(() => {
+      panel.style.width        = targetW + 'px';
+      panel.style.height       = targetH || '';
+      panel.style.borderRadius = '20px';
+      panel.style.overflow     = '';
+      panel.style.outline      = '';
+
+      snapToCorner(pState.corner);
+
+      setTimeout(() => {
+        pState.isBubble = false;
+        pState.morphing = false;
+        panel.style.width  = '';
+        panel.style.height = '';
+      }, MORPH_DUR + 40);
+    });
+  }
+
+  function spawnRipple() {
+    if (!bubble) return;
+    const ring = document.createElement('span');
+    ring.className = 'bubble-ripple';
+    const br = bubble.getBoundingClientRect();
+    ring.style.left = (br.left + br.width  / 2) + 'px';
+    ring.style.top  = (br.top  + br.height / 2) + 'px';
+    ring.style.width  = '58px';
+    ring.style.height = '58px';
+    document.body.appendChild(ring);
+    setTimeout(() => ring.remove(), 650);
+  }
+
+  /* --- Window Buttons --- */
+  if (btnBubble) {
+    btnBubble.addEventListener('click', (e) => {
+      e.stopPropagation();
+      collapsePanel();
+    });
+  }
+
+  if (btnCornerCycle) {
+    btnCornerCycle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (pState.morphing) return;
+      const idx = CORNERS.indexOf(pState.corner);
+      const next = CORNERS[(idx + 1) % CORNERS.length];
+
+      if (pState.isBubble) {
+        pState.corner = next;
+        panel.dataset.corner = next;
+        updateCornerBadge();
+        updateBubbleCorner();
+      } else {
+        snapToCorner(next);
+      }
+    });
+  }
+
+  /* --- Resize Handles --- */
+  function initResize() {
+    function startResize(e, mode) {
+      if (e.button !== 0 || pState.isBubble || pState.morphing) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const pr = panelRect();
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startW = pr.width;
+      const startH = pr.height;
+      const startL = pr.left;
+      const startT = pr.top;
+      const corner = pState.corner;
+
+      panel.style.transition = 'none';
+      panel.style.left   = startL + 'px';
+      panel.style.top    = startT + 'px';
+      panel.style.right  = '';
+      panel.style.bottom = '';
+      panel.style.width  = startW + 'px';
+      panel.style.height = startH + 'px';
+
+      const activeHandle = e.currentTarget;
+      activeHandle.classList.add('resizing');
+      document.body.style.cursor = window.getComputedStyle(activeHandle).cursor;
+
+      function onResizeMove(ev) {
+        const { w: vw, h: vh } = vp();
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+
+        let newW = startW;
+        let newH = startH;
+        let newL = startL;
+        let newT = startT;
+
+        if (mode === 'e' || mode === 'se') {
+          if (corner === 'TR' || corner === 'BR') {
+            newW = Math.max(240, startW - dx);
+            newL = startL + (startW - newW);
+          } else {
+            newW = Math.max(240, startW + dx);
+          }
+        }
+
+        if (mode === 's' || mode === 'se') {
+          if (corner === 'BL' || corner === 'BR') {
+            newH = Math.max(200, startH - dy);
+            newT = startT + (startH - newH);
+          } else {
+            newH = Math.max(200, startH + dy);
+          }
+        }
+
+        newW = Math.min(newW, vw - SNAP_GAP * 2);
+        newH = Math.min(newH, vh - SNAP_GAP * 2);
+        newL = Math.max(0, Math.min(newL, vw - newW));
+        newT = Math.max(0, Math.min(newT, vh - newH));
+
+        panel.style.width  = newW + 'px';
+        panel.style.height = newH + 'px';
+        panel.style.left   = newL + 'px';
+        panel.style.top    = newT + 'px';
+
+        pState.panelW = newW;
+        pState.panelH = newH;
+      }
+
+      function onResizeEnd() {
+        activeHandle.classList.remove('resizing');
+        document.body.style.cursor = '';
+        panel.style.transition = '';
+
+        const newCorner = detectCornerFromCenter();
+        const pr2 = panelRect();
+        pState.panelW = pr2.width;
+        pState.panelH = pr2.height;
+        snapToCorner(newCorner);
+
+        window.removeEventListener('mousemove', onResizeMove);
+        window.removeEventListener('mouseup',   onResizeEnd);
+      }
+
+      window.addEventListener('mousemove', onResizeMove);
+      window.addEventListener('mouseup',   onResizeEnd);
+    }
+
+    if (resizeE)  resizeE.addEventListener('mousedown',  (e) => startResize(e, 'e'));
+    if (resizeS)  resizeS.addEventListener('mousedown',  (e) => startResize(e, 's'));
+    if (resizeSE) resizeSE.addEventListener('mousedown', (e) => startResize(e, 'se'));
+  }
+  initResize();
+
+  /* --- Keyboard Shortcuts --- */
+  document.addEventListener('keydown', (e) => {
+    if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+    if (e.key === 'b' || e.key === 'B') {
+      if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (pState.isBubble) expandPanel();
+        else collapsePanel();
+      }
+    }
+    if (e.key === 'c' || e.key === 'C') {
+      if (!e.ctrlKey && !e.metaKey && !e.altKey && btnCornerCycle) {
+        btnCornerCycle.click();
+      }
+    }
+  });
+
+  // Init panel position
+  snapToCorner('TR');
+})();

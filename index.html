@@ -40,7 +40,32 @@
   </div>
 </div>
 <div id="main">
-<div id="sidebar">
+<div id="sidebar" role="complementary" aria-label="Floating control panel">
+  <div id="drag-handle" role="toolbar" aria-label="Panel drag handle">
+    <div class="grip-dots" aria-hidden="true">
+      <span></span><span></span>
+      <span></span><span></span>
+      <span></span><span></span>
+    </div>
+    <div class="panel-title">
+      <span class="panel-title-text">GraphCP</span>
+      <span id="corner-badge" class="corner-badge" title="Current corner">TR</span>
+    </div>
+    <div class="win-btns" role="group" aria-label="Window controls">
+      <button id="btn-corner-cycle" class="win-btn win-btn-blue" title="Cycle corner (TR → TL → BL → BR)" aria-label="Cycle panel corner">
+        <svg class="win-icon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M2 5a3 3 0 1 0 6 0 3 3 0 0 0-6 0z" stroke="none" fill="currentColor" opacity="0.6"/>
+          <path d="M7 2l1.5 1.5L7 5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button id="btn-bubble" class="win-btn win-btn-yellow" title="Minimize to water drop bubble" aria-label="Toggle bubble mode">
+        <svg class="win-icon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M5 2v3l2 2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 8h4" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
   <div class="stabs">
     <button class="stab on" data-tab="settings">&#9881; Settings</button>
     <button class="stab" data-tab="algo">&#9654; Algorithms</button>
@@ -142,6 +167,9 @@
       <button class="btn btn-s btn-w" id="btn-pmat">Parse Matrix</button>
     </div>
   </div>
+  <div class="resize-handle resize-e" id="resize-e" aria-hidden="true"></div>
+  <div class="resize-handle resize-s" id="resize-s" aria-hidden="true"></div>
+  <div class="resize-handle resize-se" id="resize-se" aria-hidden="true"></div>
 </div>
 <div id="cw">
   <canvas id="canvas"></canvas>
@@ -180,6 +208,17 @@
 </div>
 <div id="overlay"><div class="modal"><div class="modal-h"><span class="modal-title" id="modal-t">Title</span><button class="modal-x" id="modal-x">&#10005;</button></div><div class="modal-b" id="modal-b"></div></div></div>
 <div id="toast"></div>
+
+<!-- 💧 ULTRA-REALISTIC 3D WATER DROP BUBBLE 💧 -->
+<button id="bubble" class="bubble" aria-label="Expand GraphCP panel" title="Click to expand panel">
+  <div class="water-drop-glass">
+    <div class="water-drop-highlight"></div>
+    <div class="water-drop-content">
+      <span class="bubble-icon">💧</span>
+    </div>
+  </div>
+</button>
+
 <script src="app.js"></script>
 </body>
 </html>
