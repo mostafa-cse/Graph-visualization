@@ -192,10 +192,13 @@ init();
   const dragHandle     = document.getElementById('drag-handle');
   const bubble         = document.getElementById('bubble');
   const cornerBadge    = document.getElementById('corner-badge');
+  const btnExpandWidth = document.getElementById('btn-expand-width');
   const btnCornerCycle = document.getElementById('btn-corner-cycle');
   const btnBubble      = document.getElementById('btn-bubble');
+  const resizeW        = document.getElementById('resize-w');
   const resizeE        = document.getElementById('resize-e');
   const resizeS        = document.getElementById('resize-s');
+  const resizeSW       = document.getElementById('resize-sw');
   const resizeSE       = document.getElementById('resize-se');
 
   const pState = {
@@ -539,13 +542,6 @@ init();
     document.body.appendChild(ring);
     setTimeout(() => ring.remove(), 650);
   }
-
-  const btnExpandWidth = document.getElementById('btn-expand-width');
-  const resizeW        = document.getElementById('resize-w');
-  const resizeE        = document.getElementById('resize-e');
-  const resizeS        = document.getElementById('resize-s');
-  const resizeSW       = document.getElementById('resize-sw');
-  const resizeSE       = document.getElementById('resize-se');
 
   /* --- Window Buttons --- */
   if (btnExpandWidth) {
