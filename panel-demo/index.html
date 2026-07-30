@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PanelVis — Premium Floating Panel</title>
+  <meta name="description" content="Premium dark-themed floating sidebar panel with glassmorphism, water-drop bubble mode, corner snapping, and spring animations.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ░░ GLOBAL BACKGROUND GLOWS ░░ -->
+  <!-- handled by body::before and body::after in CSS -->
+
+  <!-- ░░ CANVAS AREA ░░ -->
+  <main id="canvas-area" role="main" aria-label="Canvas workspace">
+    <div id="canvas-hint">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 8v4l3 3"/>
+      </svg>
+      <span>Click anywhere · Drag the panel · Try bubble mode</span>
+    </div>
+
+    <!-- Dot grid drawn via CSS radial-gradient on canvas-area -->
+  </main>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░ FLOATING PANEL ░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <div id="panel" role="complementary" aria-label="Floating control panel">
+
+    <!-- ── DRAG HANDLE ── -->
+    <div id="drag-handle" role="toolbar" aria-label="Panel drag handle">
+      <!-- 2×3 grip dots -->
+      <div class="grip-dots" aria-hidden="true">
+        <span></span><span></span>
+        <span></span><span></span>
+        <span></span><span></span>
+      </div>
+
+      <!-- Panel title -->
+      <div class="panel-title" aria-label="Panel title">
+        <span class="panel-title-text">PanelVis</span>
+        <span id="corner-badge" class="corner-badge" title="Current corner">TR</span>
+      </div>
+
+      <!-- macOS-style window buttons -->
+      <div class="win-btns" role="group" aria-label="Window controls">
+        <button id="btn-corner-cycle" class="win-btn win-btn-blue" title="Cycle corner" aria-label="Cycle panel corner">
+          <svg class="win-icon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M2 5a3 3 0 1 0 6 0 3 3 0 0 0-6 0z" stroke="none" fill="currentColor" opacity="0.6"/>
+            <path d="M7 2l1.5 1.5L7 5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button id="btn-bubble" class="win-btn win-btn-yellow" title="Toggle bubble mode" aria-label="Toggle bubble mode">
+          <svg class="win-icon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M5 2v3l2 2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 8h4" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── SCROLLABLE CONTENT ── -->
+    <div id="panel-body">
+
+      <!-- ─ Section: Mode Toggle ─ -->
+      <section class="panel-section" aria-labelledby="lbl-mode">
+        <div class="section-label" id="lbl-mode">
+          <span>View Mode</span>
+        </div>
+        <div class="seg-control" role="group" aria-label="View mode">
+          <button class="seg-btn active" data-mode="graph" id="mode-graph">Graph</button>
+          <button class="seg-btn" data-mode="tree" id="mode-tree">Tree</button>
+          <button class="seg-btn" data-mode="matrix" id="mode-matrix">Matrix</button>
+        </div>
+      </section>
+
+      <!-- ─ Section: Graph Properties ─ -->
+      <section class="panel-section" aria-labelledby="lbl-props">
+        <div class="section-label" id="lbl-props">
+          <span>Graph Properties</span>
+        </div>
+
+        <div class="toggle-row">
+          <label class="toggle-label" for="sw-directed">Directed Graph</label>
+          <button class="toggle-sw" id="sw-directed" role="switch" aria-checked="false"></button>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle-label" for="sw-weighted">Weighted Edges</label>
+          <button class="toggle-sw" id="sw-weighted" role="switch" aria-checked="false"></button>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle-label" for="sw-labels">Show Labels</label>
+          <button class="toggle-sw on" id="sw-labels" role="switch" aria-checked="true"></button>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle-label" for="sw-grid">Dot Grid</label>
+          <button class="toggle-sw on" id="sw-grid" role="switch" aria-checked="true"></button>
+        </div>
+      </section>
+
+      <!-- ─ Section: Points List ─ -->
+      <section class="panel-section" aria-labelledby="lbl-points">
+        <div class="section-label" id="lbl-points">
+          <span>Data Points</span>
+        </div>
+
+        <ul class="points-list" id="points-list" role="list" aria-label="Data points">
+          <li class="point-item active" role="listitem">
+            <div class="point-meta">
+              <code class="point-coord">(0, 0)</code>
+              <em class="point-math">Origin</em>
+            </div>
+            <button class="point-delete" aria-label="Delete point" title="Delete">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+            </button>
+          </li>
+          <li class="point-item" role="listitem">
+            <div class="point-meta">
+              <code class="point-coord">(3, 7)</code>
+              <em class="point-math">Node α</em>
+            </div>
+            <button class="point-delete" aria-label="Delete point" title="Delete">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+            </button>
+          </li>
+          <li class="point-item" role="listitem">
+            <div class="point-meta">
+              <code class="point-coord">(−5, 2)</code>
+              <em class="point-math">Node β</em>
+            </div>
+            <button class="point-delete" aria-label="Delete point" title="Delete">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+            </button>
+          </li>
+          <li class="point-item" role="listitem">
+            <div class="point-meta">
+              <code class="point-coord">(8, −1)</code>
+              <em class="point-math">Node γ</em>
+            </div>
+            <button class="point-delete" aria-label="Delete point" title="Delete">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8"/></svg>
+            </button>
+          </li>
+        </ul>
+
+        <!-- Add point input -->
+        <div class="add-row" id="add-row">
+          <input type="text" id="add-input" class="add-input" placeholder="Node label…" aria-label="New point label">
+          <button id="btn-add" class="btn-add" aria-label="Add point">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 2v10M2 7h10" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ─ Section: Actions ─ -->
+      <section class="panel-section" aria-labelledby="lbl-actions">
+        <div class="section-label" id="lbl-actions">
+          <span>Actions</span>
+        </div>
+
+        <div class="action-grid">
+          <button class="action-btn action-secondary" id="btn-export" aria-label="Export graph">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Export
+          </button>
+          <button class="action-btn action-secondary" id="btn-import" aria-label="Import graph">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Import
+          </button>
+        </div>
+
+        <button class="action-btn action-danger" id="btn-clear" aria-label="Clear all data" style="width:100%; margin-top:6px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Clear All Data
+        </button>
+      </section>
+
+    </div><!-- /panel-body -->
+
+    <!-- ── RESIZE HANDLES ── -->
+    <div class="resize-handle resize-e"  id="resize-e"  aria-hidden="true"></div>
+    <div class="resize-handle resize-s"  id="resize-s"  aria-hidden="true"></div>
+    <div class="resize-handle resize-se" id="resize-se" aria-hidden="true"></div>
+
+  </div><!-- /panel -->
+
+  <!-- ░░ WATER DROP BUBBLE ░░ -->
+  <button id="bubble"
+          class="bubble"
+          aria-label="Expand control panel"
+          title="Click to expand panel">
+    <span class="bubble-label" aria-hidden="true">PV</span>
+    <!-- ripple ring spawned by JS -->
+  </button>
+
+  <script src="app.js"></script>
+</body>
+</html>
