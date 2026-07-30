@@ -456,3 +456,50 @@ kbd{display:inline-block;padding:1px 5px;background:var(--bg2);border:1px solid 
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* --- Credits Section --- */
+.credits-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  margin: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+.credits-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.credits-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--txt3);
+  letter-spacing: 1px;
+}
+.credits-name {
+  font-size: 13px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6bc4ff, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-family: var(--mono);
+}
+.social-links {
+  display: flex;
+  gap: 10px;
+}
+.social-links a {
+  color: var(--txt3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, transform 0.15s;
+}
+.social-links a:hover {
+  color: var(--txt);
+  transform: scale(1.1);
+}
