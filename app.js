@@ -715,3 +715,77 @@ init();
   // Init panel position
   snapToCorner('TR');
 })();
+
+/* ══════════════════════════════════════════════════════════════
+   EXPANDABLE & COLLAPSIBLE FOOTER (#output) CONTROLLER
+   ══════════════════════════════════════════════════════════════ */
+(function initExpandableFooter() {
+  const output      = document.getElementById('output');
+  const outHeader   = document.getElementById('out-header');
+  const btnToggle   = document.getElementById('btn-toggle-out');
+  const outResizeN  = document.getElementById('out-resize-n');
+
+  if (!output) return;
+
+  function toggleFooter() {
+    output.classList.toggle('collapsed');
+    const cw = document.getElementById('cw');
+    if (cw && typeof resize === 'function') resize();
+  }
+
+  if (btnToggle) {
+    btnToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleFooter();
+    });
+  }
+
+  if (outHeader) {
+    outHeader.addEventListener('dblclick', (e) => {
+      if (e.target.closest('button')) return;
+      toggleFooter();
+    });
+  }
+
+  if (outResizeN) {
+    outResizeN.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+
+      const startY = e.clientY;
+      const startH = output.getBoundingClientRect().height;
+
+      output.classList.add('dragging-n');
+      outResizeN.classList.add('resizing');
+      document.body.style.cursor = 'ns-resize';
+
+      function onMove(ev) {
+        const dy = startY - ev.clientY;
+        const maxH = window.innerHeight - 120;
+        let newH = Math.max(34, Math.min(maxH, startH + dy));
+
+        if (newH <= 45) {
+          output.classList.add('collapsed');
+          output.style.height = '';
+        } else {
+          output.classList.remove('collapsed');
+          output.style.height = newH + 'px';
+        }
+
+        const cw = document.getElementById('cw');
+        if (cw && typeof resize === 'function') resize();
+      }
+
+      function onUp() {
+        output.classList.remove('dragging-n');
+        outResizeN.classList.remove('resizing');
+        document.body.style.cursor = '';
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup',   onUp);
+      }
+
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup',   onUp);
+    });
+  }
+})();
