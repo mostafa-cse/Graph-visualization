@@ -64,7 +64,7 @@ function startPan(e){UI.isPan=true;UI.panSX=e.offsetX;UI.panSY=e.offsetY;UI.panS
 function onMM(e){UI.mx=e.offsetX;UI.my=e.offsetY;const{x,y}=s2w(e.offsetX,e.offsetY);UI.mwx=x;UI.mwy=y;if(UI.isPan){UI.panX=UI.panSPX+(e.offsetX-UI.panSX);UI.panY=UI.panSPY+(e.offsetY-UI.panSY);return;}if(UI.drag&&UI.dragN){UI.dragN.x=x+UI.dragOX;UI.dragN.y=y+UI.dragOY;return;}UI.hovNode=nodeAt(e.offsetX,e.offsetY);UI.hovEdge=UI.hovNode?null:edgeAt(e.offsetX,e.offsetY);}
 function onMU(e){if(UI.isPan){UI.isPan=false;canvas.classList.remove('m-panning');}if(UI.drag&&UI.dragN){saveH();UI.drag=false;UI.dragN=null;}}
 function onWh(e){e.preventDefault();const f=e.deltaY>0?1/ZST:ZST;const nz=Math.max(ZMN,Math.min(ZMX,UI.zoom*f));const{x,y}=s2w(e.offsetX,e.offsetY);UI.zoom=nz;UI.panX=e.offsetX-x*UI.zoom;UI.panY=e.offsetY-y*UI.zoom;}
-function onCM(e){e.preventDefault();const node=nodeAt(e.offsetX,e.offsetY);const edge=node?null:edgeAt(e.offsetX,e.offsetY);if(!node&&!edge)return;UI.ctxTgt=node||edge;UI.ctxType=node?'node':'edge';document.getElementById('cm-label').style.display=node?'':'none';document.getElementById('cm-weight').style.display=G.weighted?'':'none';document.getElementById('cm-src').style.display=node?'':'none';document.getElementById('cm-dst').style.display=node?'':'none';ctxm.style.left=e.pageX+'px';ctxm.style.top=e.pageY+'px';ctxm.classList.add('show');}
+function onCM(e){e.preventDefault();const node=nodeAt(e.offsetX,e.offsetY);const edge=node?null:edgeAt(e.offsetX,e.offsetY);if(!node&&!edge)return;UI.ctxTgt=node||edge;UI.ctxType=node?'node':'edge';document.getElementById('cm-label').style.display=node?'':'none';document.getElementById('cm-weight').style.display=G.weighted?'':'none';document.getElementById('cm-src').style.display=node?'':'none';document.getElementById('cm-dst').style.display=node?'':'none';ctxm.classList.add('show');const mw=ctxm.offsetWidth||160,mh=ctxm.offsetHeight||140;const px=Math.min(e.pageX,window.innerWidth-mw-10),py=Math.min(e.pageY,window.innerHeight-mh-10);ctxm.style.left=Math.max(10,px)+'px';ctxm.style.top=Math.max(10,py)+'px';}
 function onDbl(e){const node=nodeAt(e.offsetX,e.offsetY);if(node){editLabel(node);return;}if(UI.mode==='select'||UI.mode==='addNode')addNode(e.offsetX,e.offsetY);}
 function hideCtx(){ctxm.classList.remove('show');}
 function hideWtip(){wtip.classList.remove('show');}
@@ -170,7 +170,7 @@ function openModal(title,body){document.getElementById('modal-t').textContent=ti
 function closeModal(){document.getElementById('overlay').classList.remove('show');}
 document.getElementById('modal-x').onclick=closeModal;
 document.getElementById('overlay').addEventListener('click',e=>{if(e.target===document.getElementById('overlay'))closeModal();});
-function showSC(){openModal('Keyboard Shortcuts','<table class="sct"><thead><tr><th>Action</th><th>Key</th></tr></thead><tbody><tr><td>Select / Move</td><td><kbd>V</kbd></td></tr><tr><td>Add Node</td><td><kbd>N</kbd></td></tr><tr><td>Add Edge</td><td><kbd>E</kbd></td></tr><tr><td>Delete Mode</td><td><kbd>Del</kbd> / <kbd>Backspace</kbd></td></tr><tr><td>Quick Add Node</td><td>Double-click canvas</td></tr><tr><td>Edit Label</td><td>Double-click node</td></tr><tr><td>Context Menu</td><td>Right-click</td></tr><tr><td>Undo</td><td><kbd>Ctrl+Z</kbd></td></tr><tr><td>Redo</td><td><kbd>Ctrl+Y</kbd></td></tr><tr><td>Fit View</td><td><kbd>F</kbd></td></tr><tr><td>Cancel</td><td><kbd>Esc</kbd></td></tr><tr><td>Zoom</td><td>Scroll Wheel</td></tr><tr><td>Pan</td><td>Middle-drag</td></tr><tr><td>This Dialog</td><td><kbd>?</kbd></td></tr></tbody></table>');}
+function showSC(){openModal('Keyboard Shortcuts','<table class="sct"><thead><tr><th>Action</th><th>Key</th></tr></thead><tbody><tr><td>Select / Move</td><td><kbd>V</kbd></td></tr><tr><td>Add Node</td><td><kbd>N</kbd></td></tr><tr><td>Add Edge</td><td><kbd>E</kbd></td></tr><tr><td>Delete Mode</td><td><kbd>Del</kbd> / <kbd>Backspace</kbd></td></tr><tr><td>Toggle Water Drop</td><td><kbd>B</kbd></td></tr><tr><td>Cycle Panel Corner</td><td><kbd>C</kbd></td></tr><tr><td>Quick Add Node</td><td>Double-click canvas</td></tr><tr><td>Edit Label</td><td>Double-click node</td></tr><tr><td>Context Menu</td><td>Right-click</td></tr><tr><td>Undo</td><td><kbd>Ctrl+Z</kbd></td></tr><tr><td>Redo</td><td><kbd>Ctrl+Y</kbd></td></tr><tr><td>Fit View</td><td><kbd>F</kbd></td></tr><tr><td>Cancel</td><td><kbd>Esc</kbd></td></tr><tr><td>Zoom</td><td>Scroll Wheel</td></tr><tr><td>Pan</td><td>Middle-drag</td></tr><tr><td>This Dialog</td><td><kbd>?</kbd></td></tr></tbody></table>');}
 document.getElementById('btn-sc').onclick=showSC;
 document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;const ctrl=e.ctrlKey||e.metaKey;if(ctrl&&e.key==='z'){e.preventDefault();undo();return;}if(ctrl&&(e.key==='y'||(e.shiftKey&&e.key==='Z'))){e.preventDefault();redo();return;}if(e.key==='v'||e.key==='V')setMode('select');if(e.key==='n'||e.key==='N')setMode('addNode');if(e.key==='e'||e.key==='E')setMode('addEdge');if(e.key==='Delete'||e.key==='Backspace'){if(UI.selNode){delNode(UI.selNode);return;}if(UI.selEdge){delEdge(UI.selEdge);return;}setMode('delete');}if(e.key==='f'||e.key==='F')fitView();if(e.key==='?')showSC();if(e.key==='Escape'){UI.edgeSrc=null;desel();setMode('select');}});
 new ResizeObserver(()=>resize()).observe(document.getElementById('cw'));
@@ -707,6 +707,12 @@ init();
       if (!e.ctrlKey && !e.metaKey && !e.altKey && btnCornerCycle) {
         btnCornerCycle.click();
       }
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (!pState.isBubble && !pState.morphing) {
+      snapToCorner(pState.corner);
     }
   });
 

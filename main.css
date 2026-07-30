@@ -34,7 +34,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);display:flex;
   right:16px;
   width:290px;
   min-width:240px;
-  max-height:calc(100vh - 235px);
+  max-height:calc(100vh - 76px);
   border-radius:20px;
   background:rgba(12, 18, 34, 0.94);
   backdrop-filter:blur(35px) saturate(180%);

@@ -4,7 +4,10 @@ GraphCP is the ultimate, zero-dependency, single-file HTML5 graph editor and alg
 
 ## 🚀 Key Features
 
-*   **Zero Dependencies**: The entire editor runs from a single `index.html` file using Vanilla JS and HTML5 Canvas.
+*   **Floating & Resizable Glass Sidebar**: Moveable floating control panel that snaps to any screen corner (Top-Right, Top-Left, Bottom-Left, Bottom-Right) with smooth spring easing.
+*   **Horizontal & Vertical Resizing**: Drag the left border (`resize-w`), right border (`resize-e`), or corners to resize sideways, or click the green header button to toggle between compact (290px) and wide (480px) modes.
+*   **3D Water-Drop Bubble Mode**: Minimize the panel into an ultra-realistic 3D clear glass water sphere ("panir drop") featuring glass caustics, backdrop-filter optics, and a 3D breathing animation.
+*   **Zero Dependencies**: Built with pure Vanilla HTML5, CSS3, and Javascript.
 *   **Rich Algorithm Library**: 13 built-in algorithms categorized by Traversal, Shortest Path, Spanning Tree, Connectivity, and more.
 *   **Step-by-Step Animation**: See precisely how algorithms like Dijkstra or Tarjan's traverse your graph with full playback controls and adjustable speeds.
 *   **Advanced Export Options**: Export your graph directly to a **C++ Adjacency List**, Python Dictionary, Adjacency Matrix, Edge List, Graphviz DOT, or as a PNG image.
@@ -35,6 +38,8 @@ You can switch between tools using the top toolbar, or by utilizing the convenie
 | **Add Node** | <kbd>N</kbd> | Click anywhere on the canvas to add a new node (or double-click the canvas). |
 | **Add Edge** | <kbd>E</kbd> | Click the source node, then click the target node. |
 | **Delete Mode** | <kbd>Del</kbd> or <kbd>Backspace</kbd> | Click on a node or edge to delete it. |
+| **Toggle Water Drop** | <kbd>B</kbd> | Minimize panel to 3D glass water drop bubble / restore panel. |
+| **Cycle Panel Corner** | <kbd>C</kbd> | Dock panel to TR → TL → BL → BR corners. |
 | **Context Menu** | `Right-Click` | Right-click a node to set it as a **Source**, **Destination**, or rename its label. Right-click an edge to modify its weight. |
 | **Undo / Redo** | <kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd> | Navigate your graph edit history. |
 | **Fit View** | <kbd>F</kbd> | Automatically zoom and pan to fit all nodes on the screen. |
