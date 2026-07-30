@@ -134,18 +134,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);display:flex;
 .corner-badge.active { color: var(--blueL); background: rgba(59,158,255,0.12); border-color: rgba(59,158,255,0.3); }
 
 /* Window buttons */
-.win-btns { display: flex; gap: 6px; align-items: center; }
+.win-btns { display: flex; gap: 7px; align-items: center; }
 .win-btn {
-  width: 12px; height: 12px; border-radius: 50%; position: relative;
+  width: 15px; height: 15px; border-radius: 50%; position: relative;
   display: flex; align-items: center; justify-content: center;
-  border: none; cursor: pointer; transition: transform 150ms, filter 150ms;
+  border: none; cursor: pointer; transition: transform 150ms, filter 150ms, box-shadow 150ms;
 }
-.win-btn:hover { filter: brightness(1.2); transform: scale(1.15); }
+.win-btn:hover { filter: brightness(1.25); transform: scale(1.15); }
 .win-btn:active { transform: scale(0.9); }
-.win-btn-green { background: radial-gradient(circle at 40% 35%, #34d399, #10b981); box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.4), 0 1px 4px rgba(16,185,129,0.5); }
-.win-btn-blue { background: radial-gradient(circle at 40% 35%, #6bc4ff, #1a8fff); box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.4), 0 1px 4px rgba(59,158,255,0.5); }
-.win-btn-yellow { background: radial-gradient(circle at 40% 35%, #ffe484, #f5a623); box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.4), 0 1px 4px rgba(245,166,35,0.5); }
-.win-icon { width: 7px; height: 7px; opacity: 0; transition: opacity 150ms; color: rgba(0,0,0,0.7); }
+.win-btn-green { background: radial-gradient(circle at 40% 35%, #34d399, #10b981); box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.45), 0 1px 6px rgba(16,185,129,0.55); }
+.win-btn-blue { background: radial-gradient(circle at 40% 35%, #6bc4ff, #1a8fff); box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.45), 0 1px 6px rgba(59,158,255,0.55); }
+.win-btn-yellow { background: radial-gradient(circle at 40% 35%, #ffe484, #f5a623); box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.45), 0 1px 6px rgba(245,166,35,0.55); }
+.win-icon { width: 9px; height: 9px; opacity: 0; transition: opacity 150ms; color: rgba(0,0,0,0.75); }
 .win-btn:hover .win-icon { opacity: 1; }
 
 /* Resize handles — Left, Right, Bottom, SW, SE */
