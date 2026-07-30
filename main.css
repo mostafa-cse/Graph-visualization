@@ -142,27 +142,27 @@ body{font-family:var(--font);background:var(--bg);color:var(--txt);display:flex;
 }
 .win-btn:hover { filter: brightness(1.2); transform: scale(1.15); }
 .win-btn:active { transform: scale(0.9); }
+.win-btn-green { background: radial-gradient(circle at 40% 35%, #34d399, #10b981); box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.4), 0 1px 4px rgba(16,185,129,0.5); }
 .win-btn-blue { background: radial-gradient(circle at 40% 35%, #6bc4ff, #1a8fff); box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.4), 0 1px 4px rgba(59,158,255,0.5); }
 .win-btn-yellow { background: radial-gradient(circle at 40% 35%, #ffe484, #f5a623); box-shadow: inset 0 0 0 0.5px rgba(255,255,255,0.4), 0 1px 4px rgba(245,166,35,0.5); }
 .win-icon { width: 7px; height: 7px; opacity: 0; transition: opacity 150ms; color: rgba(0,0,0,0.7); }
 .win-btn:hover .win-icon { opacity: 1; }
 
-/* Resize handles */
+/* Resize handles — Left, Right, Bottom, SW, SE */
 .resize-handle { position: absolute; z-index: 10; transition: background 150ms; }
+.resize-w { top: 20px; left: 0; width: 6px; bottom: 20px; cursor: ew-resize; }
 .resize-e { top: 20px; right: 0; width: 6px; bottom: 20px; cursor: ew-resize; }
 .resize-s { left: 20px; bottom: 0; right: 20px; height: 6px; cursor: ns-resize; }
+.resize-sw { left: 0; bottom: 0; width: 16px; height: 16px; cursor: sw-resize; }
+.resize-sw::after { content: ''; position: absolute; left: 3px; bottom: 3px; width: 8px; height: 8px; background: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px); background-size: 3px 3px; }
 .resize-se { right: 0; bottom: 0; width: 16px; height: 16px; cursor: se-resize; }
 .resize-se::after { content: ''; position: absolute; right: 3px; bottom: 3px; width: 8px; height: 8px; background: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px); background-size: 3px 3px; }
-.resize-handle:hover, .resize-handle.resizing { background: rgba(59,158,255,0.25); border-radius: 3px; }
+.resize-handle:hover, .resize-handle.resizing { background: rgba(59,158,255,0.3); border-radius: 3px; }
 
-/* Corner-flipped resize direction styles */
-#sidebar[data-corner="TL"] .resize-e { left: 0; right: auto; cursor: ew-resize; }
-#sidebar[data-corner="TL"] .resize-se { left: 0; right: auto; cursor: sw-resize; }
-#sidebar[data-corner="BR"] .resize-s { top: 0; bottom: auto; cursor: ns-resize; }
-#sidebar[data-corner="BR"] .resize-se { top: 0; bottom: auto; cursor: ne-resize; }
-#sidebar[data-corner="BL"] .resize-e { left: 0; right: auto; cursor: ew-resize; }
-#sidebar[data-corner="BL"] .resize-s { top: 0; bottom: auto; cursor: ns-resize; }
-#sidebar[data-corner="BL"] .resize-se { left: 0; right: auto; top: 0; bottom: auto; cursor: nw-resize; }
+/* Expanded state class */
+#sidebar.is-expanded-width {
+  width: 480px !important;
+}
 
 /* 💧 ULTRA-REALISTIC 3D GLASS WATER DROP BUBBLE 💧 */
 #bubble {

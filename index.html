@@ -52,6 +52,11 @@
       <span id="corner-badge" class="corner-badge" title="Current corner">TR</span>
     </div>
     <div class="win-btns" role="group" aria-label="Window controls">
+      <button id="btn-expand-width" class="win-btn win-btn-green" title="Toggle wide / compact width" aria-label="Expand width">
+        <svg class="win-icon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M1.5 5h7M3.5 3L1.5 5l2 2M6.5 3l2 2-2 2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
       <button id="btn-corner-cycle" class="win-btn win-btn-blue" title="Cycle corner (TR → TL → BL → BR)" aria-label="Cycle panel corner">
         <svg class="win-icon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
           <path d="M2 5a3 3 0 1 0 6 0 3 3 0 0 0-6 0z" stroke="none" fill="currentColor" opacity="0.6"/>
@@ -167,8 +172,10 @@
       <button class="btn btn-s btn-w" id="btn-pmat">Parse Matrix</button>
     </div>
   </div>
+  <div class="resize-handle resize-w" id="resize-w" aria-hidden="true"></div>
   <div class="resize-handle resize-e" id="resize-e" aria-hidden="true"></div>
   <div class="resize-handle resize-s" id="resize-s" aria-hidden="true"></div>
+  <div class="resize-handle resize-sw" id="resize-sw" aria-hidden="true"></div>
   <div class="resize-handle resize-se" id="resize-se" aria-hidden="true"></div>
 </div>
 <div id="cw">

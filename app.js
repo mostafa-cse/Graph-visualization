@@ -540,7 +540,36 @@ init();
     setTimeout(() => ring.remove(), 650);
   }
 
+  const btnExpandWidth = document.getElementById('btn-expand-width');
+  const resizeW        = document.getElementById('resize-w');
+  const resizeE        = document.getElementById('resize-e');
+  const resizeS        = document.getElementById('resize-s');
+  const resizeSW       = document.getElementById('resize-sw');
+  const resizeSE       = document.getElementById('resize-se');
+
   /* --- Window Buttons --- */
+  if (btnExpandWidth) {
+    btnExpandWidth.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (pState.isBubble || pState.morphing) return;
+      const isWide = panel.classList.toggle('is-expanded-width');
+      const targetW = isWide ? 480 : 290;
+      pState.panelW = targetW;
+      
+      const corner = pState.corner;
+      const pr = panelRect();
+      if (corner === 'TR' || corner === 'BR') {
+        // Expand leftwards if right anchored
+        panel.style.left = (pr.right - targetW) + 'px';
+        panel.style.width = targetW + 'px';
+        panel.style.right = '';
+      } else {
+        panel.style.width = targetW + 'px';
+      }
+      setTimeout(() => snapToCorner(corner), 300);
+    });
+  }
+
   if (btnBubble) {
     btnBubble.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -604,16 +633,18 @@ init();
         let newL = startL;
         let newT = startT;
 
-        if (mode === 'e' || mode === 'se') {
-          if (corner === 'TR' || corner === 'BR') {
-            newW = Math.max(240, startW - dx);
-            newL = startL + (startW - newW);
-          } else {
-            newW = Math.max(240, startW + dx);
-          }
+        // Left edge resize (mode 'w' or 'sw')
+        if (mode === 'w' || mode === 'sw') {
+          newW = Math.max(240, startW - dx);
+          newL = startL + (startW - newW);
+        }
+        // Right edge resize (mode 'e' or 'se')
+        else if (mode === 'e' || mode === 'se') {
+          newW = Math.max(240, startW + dx);
         }
 
-        if (mode === 's' || mode === 'se') {
+        // Vertical resize (mode 's', 'sw', 'se')
+        if (mode === 's' || mode === 'sw' || mode === 'se') {
           if (corner === 'BL' || corner === 'BR') {
             newH = Math.max(200, startH - dy);
             newT = startT + (startH - newH);
@@ -655,8 +686,10 @@ init();
       window.addEventListener('mouseup',   onResizeEnd);
     }
 
+    if (resizeW)  resizeW.addEventListener('mousedown',  (e) => startResize(e, 'w'));
     if (resizeE)  resizeE.addEventListener('mousedown',  (e) => startResize(e, 'e'));
     if (resizeS)  resizeS.addEventListener('mousedown',  (e) => startResize(e, 's'));
+    if (resizeSW) resizeSW.addEventListener('mousedown', (e) => startResize(e, 'sw'));
     if (resizeSE) resizeSE.addEventListener('mousedown', (e) => startResize(e, 'se'));
   }
   initResize();
