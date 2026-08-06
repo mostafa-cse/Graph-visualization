@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
 <title>GraphCP — Graph Editor for Competitive Programming</title>
 <meta name="description" content="The ultimate graph editor for competitive programming. Visualize BFS, DFS, Dijkstra, Kruskal MST, bridges, SCC, topological sort and more with step-by-step animation.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="main.css">
 </head>
@@ -130,22 +132,11 @@
     </div>
     <div class="sec" id="algo-params">
       <div class="sec-h">Parameters</div>
-      <div class="field" id="p-src"><label>Source Node</label><select id="sel-src"></select></div>
-      <div class="field gone" id="p-dst"><label>Destination Node</label><select id="sel-dst"></select></div>
-      <div class="sp-row"><label>Speed</label><input type="range" id="spd-sl" min="1" max="10" value="5"><span id="spd-val" style="font-size:10px;color:var(--txt3);min-width:25px;font-family:var(--mono)">5x</span></div>
+      <div id="algo-info"><div class="ai-name">No algorithm selected</div><div class="ai-note">Pick one above to see its complexity and requirements.</div></div>
+      <div class="field" id="p-src"><label for="sel-src">Source Node</label><select id="sel-src"></select></div>
+      <div class="field gone" id="p-dst"><label for="sel-dst">Destination Node</label><select id="sel-dst"></select></div>
+      <div class="sp-row"><label for="spd-sl">Speed</label><input type="range" id="spd-sl" min="1" max="10" value="5"><span id="spd-val" style="font-size:10.5px;color:var(--txt3);min-width:26px;font-family:var(--mono)">5x</span></div>
       <button class="btn btn-p btn-w" id="btn-run">&#9654; Run Algorithm</button>
-    </div>
-    <div class="sec gone" id="anim-sec">
-      <div class="sec-h">Animation</div>
-      <div class="anim-bar">
-        <button class="abtn" id="a-first">&#9198;</button>
-        <button class="abtn" id="a-prev">&#9194;</button>
-        <button class="abtn play" id="a-play">&#9654;</button>
-        <button class="abtn" id="a-next">&#9193;</button>
-        <button class="abtn" id="a-last">&#9197;</button>
-      </div>
-      <div class="step-ctr" id="step-ctr">Step 0 / 0</div>
-      <button class="btn btn-s btn-w" style="margin-top:6px" id="btn-rst">&#8634; Reset</button>
     </div>
   </div>
   <div class="spanel gone" id="tab-io">
@@ -163,7 +154,8 @@
         <div class="exp-item"><div><div class="exp-nm">C++ Adj List</div><div class="exp-desc">vector&lt;pair&gt; adj[]</div></div><button class="exp-copy" data-exp="cpp">Copy</button></div>
         <div class="exp-item"><div><div class="exp-nm">Python Adj List</div><div class="exp-desc">dict of lists</div></div><button class="exp-copy" data-exp="py">Copy</button></div>
         <div class="exp-item"><div><div class="exp-nm">DOT (Graphviz)</div><div class="exp-desc">digraph / graph</div></div><button class="exp-copy" data-exp="dot">Copy</button></div>
-        <div class="exp-item"><div><div class="exp-nm">PNG Image</div><div class="exp-desc">Save canvas as PNG</div></div><button class="exp-copy" data-exp="png">Save</button></div>
+        <div class="exp-item"><div><div class="exp-nm">JSON</div><div class="exp-desc">Full graph + positions</div></div><button class="exp-copy" data-exp="json">Copy</button></div>
+        <div class="exp-item"><div><div class="exp-nm">PNG Image</div><div class="exp-desc">Whole graph @2x</div></div><button class="exp-copy" data-exp="png">Save</button></div>
       </div>
     </div>
     <div class="sec">
@@ -202,19 +194,36 @@
   <div class="resize-handle resize-se" id="resize-se" aria-hidden="true"></div>
 </div>
 <div id="cw">
-  <canvas id="canvas"></canvas>
-  <div id="gstats"><div class="gstat">V: <span class="gstat-val" id="sv">0</span></div><div class="gstat">E: <span class="gstat-val" id="se">0</span></div><div class="gstat">d: <span class="gstat-val" id="sd">0%</span></div></div>
-  <div id="legend">
-    <div class="leg-row"><div class="leg-dot" style="background:#3b82f6"></div>Start / Source</div>
-    <div class="leg-row"><div class="leg-dot" style="background:#ef4444"></div>End / Bridge</div>
-    <div class="leg-row"><div class="leg-dot" style="background:#f59e0b"></div>Current / Active</div>
-    <div class="leg-row"><div class="leg-dot" style="background:#7c3aed"></div>Visited / Queued</div>
-    <div class="leg-row"><div class="leg-dot" style="background:#10b981"></div>Path / MST</div>
-    <div class="leg-row"><div class="leg-dot" style="background:#60a5fa"></div>Bipartite A</div>
-    <div class="leg-row"><div class="leg-dot" style="background:#86efac"></div>Bipartite B</div>
+  <canvas id="canvas" aria-label="Graph canvas"></canvas>
+  <div id="empty">
+    <div class="empty-ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="6" r="2.4"/><circle cx="19" cy="7" r="2.4"/><circle cx="12" cy="18" r="2.4"/><path d="M6.9 7.4L10.4 16M17.2 8.6L13.7 16M7.4 6.3h9.2"/></svg></div>
+    <div class="empty-t">Start building a graph</div>
+    <div class="empty-s">Double-click anywhere on the canvas to drop a node, or load a graph from a template or an edge list.</div>
+    <div class="empty-acts">
+      <button class="btn btn-p" id="e-tmpl">Use a template</button>
+      <button class="btn btn-s" id="e-paste">Paste edge list</button>
+    </div>
+    <div class="empty-keys"><span><kbd>N</kbd> node</span><span><kbd>E</kbd> edge</span><span><kbd>V</kbd> select</span><span><kbd>?</kbd> help</span></div>
   </div>
-  <div id="mode-lbl">Select / Move</div>
-  <div id="zbar"><button class="zbtn" id="z-out">&minus;</button><span id="zlbl">100%</span><button class="zbtn" id="z-in">+</button><button class="zbtn" id="z-fit" style="font-size:10px">&#8862;</button></div>
+  <div id="gstats" class="ov"><div class="gstat">V: <span class="gstat-val" id="sv">0</span></div><div class="gstat">E: <span class="gstat-val" id="se">0</span></div><div class="gstat">d: <span class="gstat-val" id="sd">0%</span></div></div>
+  <div id="legend" class="ov" aria-label="Colour legend"></div>
+  <div id="mode-lbl" class="ov">Select / Move</div>
+  <div id="transport" class="ov gone" role="group" aria-label="Animation playback">
+    <span class="tp-badge" id="tp-name">BFS</span>
+    <div class="tp-btns">
+      <button class="tpb" id="tp-first" title="First step [Home]" aria-label="First step"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h2v14H7zM20 5v14l-10-7z"/></svg></button>
+      <button class="tpb" id="tp-prev" title="Previous step [&larr;]" aria-label="Previous step"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 5v14l-10-7z"/></svg></button>
+      <button class="tpb main" id="tp-play" title="Play / Pause [Space]" aria-label="Play or pause"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5l11 7-11 7z"/></svg></button>
+      <button class="tpb" id="tp-next" title="Next step [&rarr;]" aria-label="Next step"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l10-7z"/></svg></button>
+      <button class="tpb" id="tp-last" title="Last step [End]" aria-label="Last step"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15 5h2v14h-2zM4 5v14l10-7z"/></svg></button>
+    </div>
+    <input type="range" id="tp-seek" min="0" max="0" value="0" aria-label="Seek to step">
+    <span class="tp-ctr" id="tp-ctr">0 / 0</span>
+    <div class="tp-sep"></div>
+    <div class="tp-sp"><span>Speed</span><input type="range" id="tp-spd" min="1" max="10" value="5" aria-label="Playback speed"></div>
+    <button class="tpb" id="tp-close" title="Reset &amp; close [Esc]" aria-label="Reset and close">&#10005;</button>
+  </div>
+  <div id="zbar" class="ov"><button class="zbtn" id="z-out" title="Zoom out" aria-label="Zoom out">&minus;</button><span id="zlbl">100%</span><button class="zbtn" id="z-in" title="Zoom in" aria-label="Zoom in">+</button><button class="zbtn" id="z-fit" title="Fit view [F]" aria-label="Fit view" style="font-size:11px">&#8862;</button></div>
 </div>
 </div>
 <div id="output">
@@ -229,7 +238,7 @@
     <button class="tbtn" id="btn-clr-out" title="Clear" style="width:26px;height:26px;font-size:12px">&#10005;</button>
     <button class="tbtn" id="btn-cpy-out" title="Copy" style="width:26px;height:26px;font-size:12px">&#8856;</button>
   </div>
-  <div id="out-body"><div id="out-log"></div><div id="out-res"><div class="res-lbl">Result</div><div class="res-val" id="rval">&mdash;</div><div class="res-sub" id="rsub"></div></div></div>
+  <div id="out-body"><div id="out-log" role="log" aria-live="polite"></div><div id="out-res"><div class="res-lbl">Result</div><div class="res-val" id="rval">&mdash;</div><div class="res-sub" id="rsub"></div></div></div>
 </div>
 <div id="wtip"><input type="number" id="win" value="1" min="-9999" max="9999"><button class="btn btn-p wbtn" id="wok">OK</button><button class="btn btn-s wbtn" id="wcancel">&#10005;</button></div>
 <div id="ctxm">
@@ -240,8 +249,8 @@
   <div class="cm-sep"></div>
   <div class="cm-item danger" id="cm-del">&#128465; Delete</div>
 </div>
-<div id="overlay"><div class="modal"><div class="modal-h"><span class="modal-title" id="modal-t">Title</span><button class="modal-x" id="modal-x">&#10005;</button></div><div class="modal-b" id="modal-b"></div></div></div>
-<div id="toast"></div>
+<div id="overlay" role="dialog" aria-modal="true" aria-labelledby="modal-t"><div class="modal"><div class="modal-h"><span class="modal-title" id="modal-t">Title</span><button class="modal-x" id="modal-x" aria-label="Close dialog">&#10005;</button></div><div class="modal-b" id="modal-b"></div></div></div>
+<div id="toasts" role="status" aria-live="polite"></div>
 
 <!-- 💧 ULTRA-REALISTIC 3D WATER DROP BUBBLE 💧 -->
 <button id="bubble" class="bubble" aria-label="Expand GraphCP panel" title="Click to expand panel">
